@@ -7,51 +7,72 @@ import java.util.HashMap;
 
 public class csvReader {
 
-    public static ArrayList<String> ReadsLines (String filePath){
+    public static ArrayList<String> readLines (String filePath) {
         ArrayList<String> lines = new ArrayList<>();
-        String line = "";
+        String line;
 
         try {
             BufferedReader br = new BufferedReader(new FileReader(filePath));
-            while((line = br.readLine()) != null){
+            while ((line = br.readLine()) != null) {
                 lines.add(line);
             }
-        } catch (IOException e ) {
+        } catch (IOException e) {
             e.printStackTrace();
             return new ArrayList<>();
         }
         return lines;
     }
 
-    public static HashMap<String, Integer> GameMusicReader (String fileName) {
-        HashMap <String, Integer> artists = new HashMap<>();
+    public static HashMap<String, Integer> getArtistSongCounts (String fileName) {
+        HashMap<String, Integer> artists = new HashMap<>();
 
-        for(String line:  ReadsLines(fileName)){
-            if (line.equals("Artists / source,Song Title")) {continue; }
+        ArrayList<String> lines = readLines(fileName);
+        int i = 0;
+        if (isHeader(lines.getFirst())) {
+            i = 1;
+        }
+
+        for (; i<lines.size(); i++) {
+            String line = lines.get(i);
             ArrayList<String> values = new ArrayList<>(Arrays.asList(line.split(",")));
-            String firstIndex = values.getFirst();
-            if (!artists.containsKey(firstIndex)){
-                artists.put(firstIndex,0);
+            String currArtist = values.getFirst();
+            if (!artists.containsKey(currArtist)) {
+                artists.put(currArtist, 0);
             }
-            if (artists.containsKey(firstIndex)){
-                int artistCount = artists.get(firstIndex);
-                artists.replace(firstIndex,artistCount+1);
+            if (artists.containsKey(currArtist)) {
+                int artistCount = artists.get(currArtist);
+                artists.replace(currArtist, artistCount + 1);
             }
         }
-        String finalStr = "There's " + artists.size()+ " artists:";
-        System.out.println(finalStr);//total artists
+        System.out.println("There's " + artists.size() + " artists:");//total artists
         hashMapPrinter(artists);//artist count
         return artists;
     }
 
+    public static boolean isHeader (String header) {
+        ArrayList<String> values = new ArrayList<>(Arrays.asList(header.split(",")));
+        //data must be in the format artist,song
+        if (values.size() != 2) {
+            return true;
+        }
+        for (String v : values) {
+            if (v.toLowerCase().contains("artist")||
+                    v.toLowerCase().contains("song") ||
+                    v.toLowerCase().contains("title")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static void hashMapPrinter (HashMap<String,Integer> artists){
         String grammerPoint;
-        for (String artist :artists.keySet()) {
+        for (String artist : artists.keySet()) {
 
-            if (artists.get(artist) ==1){
+            if (artists.get(artist) == 1){
                 grammerPoint = " time.";
             } else {grammerPoint = " times.";}
-            System.out.println(artist+": shows up "+artists.get(artist)+grammerPoint);
+            System.out.println(artist + ": shows up "+artists.get(artist)+grammerPoint);
         }
     }
 }
