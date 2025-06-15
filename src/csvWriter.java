@@ -1,6 +1,4 @@
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 
 public class csvWriter {
@@ -19,6 +17,7 @@ public class csvWriter {
     }
     public static void fileInput(File inputFile) throws IOException {
         String fileName = inputFile.getAbsolutePath();//gets file from GUI
+
         HashMap<String,Integer> artistsSongCount = csvReader.getArtistSongCounts(fileName);//gets artist count
         String newFilename = fileName.substring(0,fileName.length()-4);//gets rid of ".csv"
         newFilename += " counted.csv";//marks that the file is "counted"

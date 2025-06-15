@@ -39,9 +39,6 @@ public class myFrame extends JFrame implements ActionListener {
 
         //btn.setHorizontalTextPosition(JLabel.TOP);
         btn.setSize(200,200);
-
-
-
         this.add(btn);//puts button into frame
 
         this.pack();
@@ -51,6 +48,13 @@ public class myFrame extends JFrame implements ActionListener {
 
     @Override
     public void actionPerformed (ActionEvent e){
+        JLabel lastLabel = new JLabel("");
+        lastLabel.setSize(300,300);
+        lastLabel.setForeground(new Color(0xB4AEE1));
+        lastLabel.setHorizontalAlignment(JLabel.CENTER);
+        lastLabel.setVerticalAlignment(JLabel.CENTER);
+        this.add(lastLabel);
+
         if(e.getSource()==btn) {
 
             JFileChooser file_upload = new JFileChooser();
@@ -59,28 +63,42 @@ public class myFrame extends JFrame implements ActionListener {
             int res = file_upload.showOpenDialog(null);
             //int res_2 = file_upload.showSaveDialog(null);//button is save
 
-            JLabel lastLabel = new JLabel("file counted!");
-            lastLabel.setSize(300,300);
-            lastLabel.setForeground(new Color(0xB4AEE1));
-            lastLabel.setHorizontalAlignment(JLabel.CENTER);
-            lastLabel.setVerticalAlignment(JLabel.CENTER);
+
 
             if(res == JFileChooser.APPROVE_OPTION){
+                String fileName = file_upload.getSelectedFile().getName();
+
+                int start = fileName.lastIndexOf(".");
+                start++;//skip "."
+                String str = "";
+
+                for (int i = start; i < fileName.length(); i++) {
+                    str += fileName.charAt(i);
+                }
+                if (!str.equals("csv")) {
+                    lastLabel.setText("please submit a csv file");
+                    this.add(lastLabel);
+                    this.pack();
+                    return;
+                }
+
                 File file_path = new File(file_upload.getSelectedFile().getAbsolutePath());
                 System.out.println(file_path);//if you select a file we need to select it's path
 
                 try {
                     csvWriter.fileInput(file_path);
-                    this.add(lastLabel);
+
+
+                    lastLabel.setText("");
+                    lastLabel.setText("file counted!");
                     this.pack();
                 } catch (IOException ex) {
                     lastLabel.setText("failed to count file");
-                    this.add(lastLabel);
+                    this.pack();
                     //throw new RuntimeException(ex);
                 }
             } else {
                 lastLabel.setText("please select valid file");
-                this.add(lastLabel);
                 this.pack();
             }
         }
